@@ -1,10 +1,16 @@
 const { Post } = require("../db/post");
 const { validateInput } = require("../config/validate");
+const { pagination } = require("../config/pagination");
 
 const PostGet = async (req, res) => {
-  const posts = await Post.find();
+  const { page, page_size } = pagination(req);
+  const posts = await Post.find()
+    .limit(page_size)
+    .skip(page * page_size);
   res.send({
-    status: "ok",
+    page,
+    count: posts.length,
+    page_size,
     data: posts,
   });
 };
@@ -24,7 +30,6 @@ const PostGetOne = async (req, res) => {
     });
   }
   res.send({
-    message: "ok",
     data: foundPost,
   });
 };

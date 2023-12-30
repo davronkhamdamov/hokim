@@ -1,10 +1,15 @@
 const { SwiperPost } = require("../db/swiperPost");
 const { validateInput } = require("../config/validate");
-
+const { pagination } = require("../config/pagination");
 const swiperPostGet = async (req, res) => {
-  const posts = await SwiperPost.find();
+  const { page, page_size } = pagination(req);
+  const posts = await SwiperPost.find()
+    .limit(page_size)
+    .skip(page * page_size);
   res.send({
-    message: "ok",
+    page,
+    count: posts.length,
+    page_size,
     data: posts,
   });
 };
