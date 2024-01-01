@@ -1,11 +1,13 @@
 const { Post } = require("../db/post");
 const { validateInput } = require("../config/validate");
 const { pagination } = require("../config/pagination");
+const { postCategory } = require("../db/post_category");
 
 const PostGet = async (req, res) => {
   const { page, page_size } = pagination(req);
   const posts = await Post.find()
-    .sort({ created_at: -1 })
+    .populate("category")
+    .sort({ created_at: 1 })
     .limit(page_size)
     .skip(page * page_size);
   res.send({
@@ -35,13 +37,18 @@ const PostGetOne = async (req, res) => {
   });
 };
 const PostCreate = async (req, res) => {
-  const newPost = new Post({
-    title: req.body.title,
-    description: req.body.description,
-    img_url: req.body.img_url,
-  });
-  await newPost.save();
-  res.send({ message: "ok" });
+  try {
+    const newPost = new Post({
+      title: req.body.title,
+      description: req.body.description,
+      img_url: req.body.img_url,
+      category_id: req.body.category_id,
+    });
+    await newPost.save();
+    res.send({ message: "ok" });
+  } catch (err) {
+    res.send(err.message);
+  }
 };
 const PostDelete = async (req, res) => {
   const { id } = req.body;
@@ -82,4 +89,31 @@ const PostUpdate = async (req, res) => {
   });
   res.send({ message: "updated" });
 };
-module.exports = { PostGet, PostCreate, PostGetOne, PostDelete, PostUpdate };
+const findByCategory = async (req, res) => {
+  const category = await postCategory.findOne({ _id: req.params.id });
+  if (!category) {
+    return res.status(404).send({
+      message: "Category not found",
+    });
+  }
+  const { page, page_size } = pagination(req);
+  const foundPostsByCategory = await Post.find({ category: req.params.id })
+    .find({ _id: req.params.id })
+    .sort({ created_at: 1 })
+    .limit(page_size)
+    .skip(page * page_size);
+  res.send({
+    page,
+    count: foundPostsByCategory.length,
+    page_size,
+    data: foundPostsByCategory,
+  });
+};
+module.exports = {
+  PostGet,
+  PostCreate,
+  PostGetOne,
+  PostDelete,
+  PostUpdate,
+  findByCategory,
+};

@@ -1,6 +1,6 @@
 const pagination = (req) => {
-  const pageAsNumber = Number.parseInt(req.query.page);
-  const sizeAsNumber = Number.parseInt(req.query.page_size);
+  const pageAsNumber = Number.parseInt(req.params.page);
+  const sizeAsNumber = Number.parseInt(req.params.page_size);
   let page = 0;
   if (!Number.isNaN(pageAsNumber) && pageAsNumber > 1) {
     page = pageAsNumber;
