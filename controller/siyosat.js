@@ -1,24 +1,24 @@
-const { Post } = require("../db/post");
+const { Siyosat } = require("../db/siyosat");
 const { validateInput } = require("../config/validate");
 const { pagination } = require("../config/pagination");
-const { postCategory } = require("../db/post_category");
+const { siyosatCategory } = require("../db/siyosat_category");
 
-const PostGet = async (req, res) => {
+const siyosatGet = async (req, res) => {
   const { page, page_size } = pagination(req);
-  const posts = await Post.find()
+  const siyosat = await Siyosat.find()
     .populate("category")
     .sort({ created_at: 1 })
     .limit(page_size)
     .skip(page * page_size);
   res.send({
     page,
-    count: posts.length,
+    count: siyosat.length,
     page_size,
-    data: posts,
+    data: siyosat,
   });
 };
 
-const PostGetOne = async (req, res) => {
+const siyosatGetOne = async (req, res) => {
   const { id } = req.params;
   if (!id || !validateInput(id)) {
     return res.status(400).send({
@@ -26,17 +26,17 @@ const PostGetOne = async (req, res) => {
         "input must be a 24 character hex string, 12 byte Uint8Array, or an integer",
     });
   }
-  const foundPost = await Post.findOne({ _id: id });
-  if (!foundPost) {
+  const foundSiyosat = await Siyosat.findOne({ _id: id });
+  if (!foundSiyosat) {
     return res.send({
-      message: "Post not found: " + id,
+      message: "Siyosat not found: " + id,
     });
   }
   res.send({
-    data: foundPost,
+    data: foundSiyosat,
   });
 };
-const PostCreate = async (req, res) => {
+const siyosatCreate = async (req, res) => {
   try {
     const newPost = new Post({
       title: req.body.title,
@@ -47,27 +47,27 @@ const PostCreate = async (req, res) => {
     await newPost.save();
     res.send({ message: "ok" });
   } catch (err) {
-    res.send({ message: err.message });
+    res.send(err.message);
   }
 };
-const PostDelete = async (req, res) => {
-  const foundPost = await Post.findOne({ _id: id });
+const siyosatDelete = async (req, res) => {
+  const { id } = req.body;
+  const foundSiyosat = await Siyosat.findOne({ _id: id });
   if (!id || !validateInput(id)) {
     return res.status(400).send({
       message:
         "input must be a 24 character hex string, 12 byte Uint8Array, or an integer",
     });
   }
-  if (!foundPost) {
-    const { id } = req.body;
+  if (!foundSiyosat) {
     return res.send({
       message: "Post not found: " + req.body.id,
     });
   }
-  await Post.findByIdAndDelete(id);
+  await Siyosat.findByIdAndDelete(id);
   res.send({ message: "deleted" });
 };
-const PostUpdate = async (req, res) => {
+const siyosatUpdate = async (req, res) => {
   const { img_url, title, description } = req.body;
   if (!req.params.id || !validateInput(req.params.id)) {
     return res.status(400).send({
@@ -75,13 +75,13 @@ const PostUpdate = async (req, res) => {
         "input must be a 24 character hex string, 12 byte Uint8Array, or an integer",
     });
   }
-  const foundPost = await Post.findOne({ _id: req.params.id });
-  if (!foundPost) {
+  const foundSiyosat = await Siyosat.findOne({ _id: req.params.id });
+  if (!foundSiyosat) {
     return res.send({
-      message: "Swiper Post not found: " + req.params.id,
+      message: "Siyosat Post not found: " + req.params.id,
     });
   }
-  await Post.findByIdAndUpdate(req.params.id, {
+  await Siyosat.findByIdAndUpdate(req.params.id, {
     img_url,
     title,
     description,
@@ -90,30 +90,30 @@ const PostUpdate = async (req, res) => {
   res.send({ message: "updated" });
 };
 const findByCategory = async (req, res) => {
-  const category = await postCategory.findOne({ _id: req.params.id });
-  if (!category) {
+  const siyosat = await siyosatCategory.findOne({ _id: req.params.id });
+  if (!siyosat) {
     return res.status(404).send({
       message: "Category not found",
     });
   }
   const { page, page_size } = pagination(req);
-  const foundPostsByCategory = await Post.find({ category: req.params.id })
+  const foundSiyosatByCategory = await Siyosat.find({ category: req.params.id })
     .find({ _id: req.params.id })
     .sort({ created_at: 1 })
     .limit(page_size)
     .skip(page * page_size);
   res.send({
     page,
-    count: foundPostsByCategory.length,
+    count: foundSiyosatByCategory.length,
     page_size,
-    data: foundPostsByCategory,
+    data: foundSiyosatByCategory,
   });
 };
 module.exports = {
-  PostGet,
-  PostCreate,
-  PostGetOne,
-  PostDelete,
-  PostUpdate,
+  siyosatGet,
+  siyosatCreate,
+  siyosatGetOne,
+  siyosatDelete,
+  siyosatUpdate,
   findByCategory,
 };

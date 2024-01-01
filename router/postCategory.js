@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const {
-  postCategoryGet,
+  siyosatCategoryGet,
   postCategoryUpdate,
   postCategoryCreate,
   postCategoryDelete,
@@ -8,10 +8,10 @@ const {
 } = require("../controller/postCategory");
 const rout = Router();
 
-rout.get("/post-category", postCategoryGet);
-rout.get("/post-category/:id", postCategoryGetOne);
-rout.post("/post-category", postCategoryCreate);
-rout.put("/post-category", postCategoryUpdate);
-rout.delete("/post-category", postCategoryDelete);
+rout.get("/siyosat-category", siyosatCategoryGet);
+rout.get("/siyosat-category/:id", postCategoryGetOne);
+rout.post("/siyosat-category", postCategoryCreate);
+rout.put("/siyosat-category", postCategoryUpdate);
+rout.delete("/siyosat-category", postCategoryDelete);
 
 module.exports = rout;

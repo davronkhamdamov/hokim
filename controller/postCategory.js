@@ -38,7 +38,7 @@ const postCategoryCreate = async (req, res) => {
 };
 
 module.exports = {
-  postCategoryGet,
+  siyosatCategoryGet: postCategoryGet,
   postCategoryCreate,
   postCategoryUpdate,
   postCategoryGetOne,
