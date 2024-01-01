@@ -98,13 +98,14 @@ const findByCategory = async (req, res) => {
   }
   const { page, page_size } = pagination(req);
   const foundPostsByCategory = await Post.find({ category: req.params.id })
-    .find({ _id: req.params.id })
     .sort({ created_at: 1 })
     .limit(page_size)
     .skip(page * page_size);
   res.send({
     page,
-    count: foundPostsByCategory.length,
+    count: Math.ceil(
+      (await Post.countDocuments({ category: req.params.id })) / page_size,
+    ),
     page_size,
     data: foundPostsByCategory,
   });

@@ -38,16 +38,16 @@ const siyosatGetOne = async (req, res) => {
 };
 const siyosatCreate = async (req, res) => {
   try {
-    const newPost = new Post({
+    const newPost = new Siyosat({
       title: req.body.title,
       description: req.body.description,
       img_url: req.body.img_url,
-      category: req.body.category_id,
+      category: req.body.category,
     });
     await newPost.save();
     res.send({ message: "ok" });
   } catch (err) {
-    res.send(err.message);
+    res.send({ message: err.message });
   }
 };
 const siyosatDelete = async (req, res) => {
