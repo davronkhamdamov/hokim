@@ -15,6 +15,12 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send({
+    message: "ok",
+  });
+});
+
 app.use(post);
 app.use(swiperPost);
 app.use(supportPost);
