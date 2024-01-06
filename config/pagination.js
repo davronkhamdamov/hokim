@@ -6,7 +6,7 @@ const pagination = (req) => {
     page = pageAsNumber;
   }
   let page_size = 10;
-  if (!Number.isNaN(sizeAsNumber) && pageAsNumber > 0 && pageAsNumber < 10) {
+  if (!Number.isNaN(sizeAsNumber) && pageAsNumber > 0 && pageAsNumber > 10) {
     page_size = sizeAsNumber;
   }
   return { page_size, page };
