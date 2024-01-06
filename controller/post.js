@@ -17,6 +17,20 @@ const PostGet = async (req, res) => {
     data: posts,
   });
 };
+const PostGetByTuman = async (req, res) => {
+  const { page, page_size } = pagination(req);
+  const posts = await Post.find({ tuman: req.params.tuman })
+    .populate("category")
+    .sort({ created_at: 1 })
+    .limit(page_size)
+    .skip(page * page_size);
+  res.send({
+    page,
+    count: posts.length,
+    page_size,
+    data: posts,
+  });
+};
 
 const PostGetOne = async (req, res) => {
   const { id } = req.params;
@@ -119,4 +133,5 @@ module.exports = {
   PostDelete,
   PostUpdate,
   findByCategory,
+  PostGetByTuman,
 };
