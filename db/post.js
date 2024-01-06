@@ -9,6 +9,7 @@ const PostSchema = new mongoose.Schema({
     ref: "post_category",
     required: true,
   },
+  tuman: { type: String, default: null },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });

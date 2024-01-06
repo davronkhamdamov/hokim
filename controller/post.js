@@ -43,6 +43,7 @@ const PostCreate = async (req, res) => {
       description: req.body.description,
       img_url: req.body.img_url,
       category: req.body.category_id,
+      tuman: req.body.tuman,
     });
     await newPost.save();
     res.send({ message: "ok" });
@@ -68,7 +69,7 @@ const PostDelete = async (req, res) => {
   res.send({ message: "deleted" });
 };
 const PostUpdate = async (req, res) => {
-  const { img_url, title, description } = req.body;
+  const { img_url, title, description, tuman } = req.body;
   if (!req.params.id || !validateInput(req.params.id)) {
     return res.status(400).send({
       message:
@@ -85,6 +86,7 @@ const PostUpdate = async (req, res) => {
     img_url,
     title,
     description,
+    tuman,
     updated_at: new Date(),
   });
   res.send({ message: "updated" });
