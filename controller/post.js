@@ -66,6 +66,7 @@ const PostCreate = async (req, res) => {
   }
 };
 const PostDelete = async (req, res) => {
+  const { id } = req.body;
   const foundPost = await Post.findOne({ _id: id });
   if (!id || !validateInput(id)) {
     return res.status(400).send({
@@ -74,7 +75,6 @@ const PostDelete = async (req, res) => {
     });
   }
   if (!foundPost) {
-    const { id } = req.body;
     return res.send({
       message: "Post not found: " + req.body.id,
     });
