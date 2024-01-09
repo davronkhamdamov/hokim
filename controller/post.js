@@ -21,7 +21,7 @@ const PostGetByTuman = async (req, res) => {
   const { page, page_size } = pagination(req);
   if (req.params.tuman === "Hammasi") {
     const posts = await Post.find({ tuman: req.params.tuman });
-    res.send({
+    return res.send({
       page,
       count: posts.length,
       page_size,
