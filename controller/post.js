@@ -20,7 +20,7 @@ const PostGet = async (req, res) => {
 const PostGetByTuman = async (req, res) => {
   const { page, page_size } = pagination(req);
   const posts =
-    req.params.tuman !== "Hammasi" || req.params.tuman !== ""
+    req.params.tuman !== "Hammasi" || req.params.tuman !== null
       ? await Post.find({ tuman: req.params.tuman })
           .populate("category")
           .sort({ created_at: 1 })
