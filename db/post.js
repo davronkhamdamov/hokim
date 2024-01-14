@@ -10,6 +10,18 @@ const PostSchema = new mongoose.Schema({
     required: true,
   },
   tuman: { type: String, default: null },
+  field: {
+    type: String,
+    default: null,
+    enum: [
+      "Ijtimoiy",
+      "Iqtisodiyot",
+      "Xotin qizlar",
+      "Qishloq xo'jaligi",
+      "OAV",
+    ],
+  },
+  decision: { type: String, default: null },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });
