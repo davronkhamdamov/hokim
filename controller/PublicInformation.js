@@ -34,7 +34,7 @@ const PublicInformationGetOne = async (req, res) => {
 };
 const PublicInformationCreate = async (req, res) => {
   try {
-    const newPublicInformation = new Post({
+    const newPublicInformation = new PublicInformation({
       title: req.body.title,
       description: req.body.description,
       img_url: req.body.img_url,
