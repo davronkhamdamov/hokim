@@ -39,7 +39,7 @@ const PublicInformationCreate = async (req, res) => {
       description: req.body.description,
       img_url: req.body.img_url,
     });
-    await newPost.save();
+    await newPublicInformation.save();
     res.send({ message: "ok" });
   } catch (err) {
     res.send({ message: err.message });
