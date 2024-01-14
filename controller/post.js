@@ -20,7 +20,12 @@ const PostGet = async (req, res) => {
 const PostGetByTuman = async (req, res) => {
   const { page, page_size } = pagination(req);
   const posts =
-    req.params.tuman !== "Hammasi" ? await Post.find({ tuman: req.params.tuman })
+    req.params.tuman !== "Hammasi"
+      ? await Post.find({
+          tuman: req.params.tuman,
+          field: req.params.field,
+          decision: req.params.decision,
+        })
           .populate("category")
           .sort({ created_at: 1 })
           .limit(page_size)
