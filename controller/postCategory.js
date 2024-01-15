@@ -1,5 +1,5 @@
 const PostCategory = require("../db/post_category");
-PostCategory.sync({ force: false });
+
 const postCategoryGet = async (req, res) => {
   try {
     res.send(await PostCategory.findAll());

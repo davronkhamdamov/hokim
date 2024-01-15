@@ -2,8 +2,8 @@ const Siyosat = require("../db/siyosat");
 const SiyosatCategory = require("../db/siyosat_category");
 const { validateInput } = require("../config/validate");
 const { pagination } = require("../config/pagination");
-Siyosat.sync({ force: false });
-SiyosatCategory.sync({ force: false });
+Siyosat.sync({ force: true });
+SiyosatCategory.sync({ force: true });
 const siyosatGet = async (req, res) => {
   try {
     const { page, page_size } = pagination(req);
