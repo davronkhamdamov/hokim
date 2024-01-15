@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../core/db");
+const SiyosatCategory = require("./siyosat_category");
 
 const Siyosat = sequelize.define(
   "siyosat",
@@ -43,4 +44,7 @@ const Siyosat = sequelize.define(
   },
 );
 
+SiyosatCategory.hasMany(Siyosat, {
+  foreignKey: "category_id",
+});
 module.exports = Siyosat;
