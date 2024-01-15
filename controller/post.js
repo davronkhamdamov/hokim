@@ -2,8 +2,8 @@ const { validateInput } = require("../config/validate");
 const { pagination } = require("../config/pagination");
 const PostCategory = require("../db/post_category");
 const Post = require("../db/post");
-PostCategory.sync({ force: true });
-Post.sync({ force: true });
+PostCategory.sync({ force: false });
+Post.sync({ force: false });
 const PostGet = async (req, res) => {
   try {
     const { page, page_size } = pagination(req);
