@@ -1,10 +1,36 @@
-const mongoose = require("mongoose");
-const { data } = require("../config/viloyat");
-const hududlarSchema = new mongoose.Schema({
-  tuman: { type: String, enum: data, require: true },
-  updated_at: { type: Date, default: new Date() },
-  created_at: { type: Date, default: new Date() },
-});
-const hududlar = mongoose.model("hududlar", hududlarSchema);
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../core/db");
 
-module.exports = hududlar;
+const Hududlar = sequelize.define(
+  "hududlar",
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+      allowNull: false,
+    },
+    tuman: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: "Tuman is required",
+        },
+      },
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    timestamps: false,
+  },
+);
+
+module.exports = Hududlar;

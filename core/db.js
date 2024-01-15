@@ -1,8 +1,14 @@
-const mongoose= require("mongoose")
-mongoose.connect(process.env.MONGO_DB_URL)
-    .then(() => {
-    console.log('success');
-    }).catch(err => {
-    console.log("errorni ushlab oldimmmm"+err);
-})
-module.exports = {mongoose}
+const { Sequelize } = require("sequelize");
+
+const sequelize = new Sequelize(process.env.POSTGRES_URL, { logging: false });
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log("Connection has been established successfully.");
+  })
+  .catch((err) => {
+    console.error("Unable to connect to the database:", err);
+  });
+
+module.exports = { sequelize };

@@ -1,65 +1,105 @@
-const { Support } = require("../db/support");
+const Support = require("../db/support");
 const { validateInput } = require("../config/validate");
 const { pagination } = require("../config/pagination");
-
+Support.sync({ force: false });
 const SupportGet = async (req, res) => {
-  const { page, page_size } = pagination(req);
-  const support = await Support.find()
-    .sort({ created_at: -1 })
-    .limit(page_size)
-    .skip(page * page_size);
-  res.send({
-    page,
-    count: support?.length,
-    page_size,
-    data: support,
-  });
+  try {
+    const { page, page_size } = pagination(req);
+    const support = await Support.findAll({
+      order: [["created_at", "DESC"]],
+      limit: page_size,
+      offset: page * page_size,
+    });
+
+    res.send({
+      page,
+      count: support?.length,
+      page_size,
+      data: support,
+    });
+  } catch (error) {
+    console.error("Error fetching support:", error);
+    res.status(500).send("Internal Server Error");
+  }
 };
 
 const SupportGetOne = async (req, res) => {
-  const { id } = req.params;
-  if (!id || !validateInput(id)) {
-    return res.status(400).send({
-      message:
-        "input must be a 24 character hex string, 12 byte Uint8Array, or an integer",
+  try {
+    const { id } = req.params;
+
+    if (!id || !validateInput(id)) {
+      return res.status(400).send({
+        message: "Input must be a valid identifier.",
+      });
+    }
+
+    const foundSupport = await Support.findOne({
+      where: {
+        id: id,
+      },
     });
-  }
-  const foundSupport = await Support.findOne({ _id: id });
-  if (!foundSupport) {
-    return res.send({
-      message: "Post not found: " + id,
+
+    if (!foundSupport) {
+      return res.status(404).send({
+        message: "Support not found: " + id,
+      });
+    }
+
+    res.send({
+      data: foundSupport,
     });
+  } catch (error) {
+    console.error("Error fetching support by id:", error);
+    res.status(500).send("Internal Server Error");
   }
-  res.send({
-    data: foundSupport,
-  });
 };
+
 const SupportCreate = async (req, res) => {
-  const newPost = new Support({
-    phone: req.body.phone,
-    text: req.body.text,
-    name: req.body.name,
-  });
-  await newPost.save();
-  res.send({ message: "ok" });
+  try {
+    const { phone, text, name } = req.body;
+    await Support.create({
+      phone,
+      text,
+      name,
+    });
+
+    res.send({ message: "ok" });
+  } catch (error) {
+    console.error("Error creating support:", error);
+    res.status(500).send("Internal Server Error");
+  }
 };
+
 const SupportDelete = async (req, res) => {
-  const { id } = req.body;
-  const foundSupport = await Support.findOne({ _id: id });
-  if (!id || !validateInput(id)) {
-    return res.status(400).send({
-      message:
-        "input must be a 24 character hex string, 12 byte Uint8Array, or an integer",
+  try {
+    const { id } = req.body;
+    const foundSupport = await Support.findOne({ where: { id: id } });
+
+    if (!id || !validateInput(id)) {
+      return res.status(400).send({
+        message: "Input must be a valid identifier.",
+      });
+    }
+
+    if (!foundSupport) {
+      return res.status(404).send({
+        message: "Support not found: " + req.body.id,
+      });
+    }
+
+    await Support.destroy({
+      where: {
+        id: id,
+      },
     });
+
+    res.send({ message: "deleted" });
+  } catch (error) {
+    console.error("Error deleting support:", error);
+    res.status(500).send("Internal Server Error");
   }
-  if (!foundSupport) {
-    return res.send({
-      message: "Post not found: " + req.body.id,
-    });
-  }
-  await Support.findByIdAndDelete(id);
-  res.send({ message: "deleted" });
 };
+
 module.exports = {
   SupportGet,
   SupportCreate,

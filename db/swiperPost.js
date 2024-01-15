@@ -1,13 +1,39 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../core/db");
 
-const SwiperPostSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  img_url: { type: String, required: true },
-  created_at: { type: Date, default: new Date() },
-  updated_at: { type: Date, default: new Date() },
-});
+const SwiperPost = sequelize.define(
+  "swiperPosts",
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+      allowNull: false,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    img_url: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    timestamps: false,
+  },
+);
 
-const SwiperPost = mongoose.model("swiperPosts", SwiperPostSchema);
-
-module.exports = { SwiperPost };
+module.exports = SwiperPost;

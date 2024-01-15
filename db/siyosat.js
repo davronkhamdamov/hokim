@@ -1,18 +1,46 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../core/db");
 
-const siyosatSchema = new mongoose.Schema({
-  title: { type: String, required: true, trim: true },
-  description: { type: String, required: true, trim: true },
-  img_url: { type: String, required: true, trim: true },
-  category: {
-    type: mongoose.Types.ObjectId,
-    ref: "siyosat_category",
-    required: true,
+const Siyosat = sequelize.define(
+  "siyosat",
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+      allowNull: false,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      trim: true,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      trim: true,
+    },
+    img_url: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      trim: true,
+    },
+    category_id: {
+      type: DataTypes.UUID, // Assuming your category IDs are UUIDs
+      allowNull: false,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   },
-  created_at: { type: Date, default: new Date() },
-  updated_at: { type: Date, default: new Date() },
-});
+  {
+    timestamps: false,
+  },
+);
 
-const Siyosat = mongoose.model("siyosat", siyosatSchema);
-
-module.exports = { Siyosat };
+module.exports = Siyosat;

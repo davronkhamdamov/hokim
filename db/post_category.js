@@ -1,9 +1,27 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../core/db");
 
-const postCategorySchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  created_at: { type: Date, default: new Date() },
-});
-const postCategory = mongoose.model("post_category", postCategorySchema);
+const PostCategory = sequelize.define(
+  "post_category",
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+      allowNull: false,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    timestamps: false,
+  },
+);
 
-module.exports = { postCategory };
+module.exports = PostCategory;

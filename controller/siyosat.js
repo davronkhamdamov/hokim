@@ -1,112 +1,187 @@
-const { Siyosat } = require("../db/siyosat");
+const Siyosat = require("../db/siyosat");
+const SiyosatCategory = require("../db/siyosat_category");
 const { validateInput } = require("../config/validate");
 const { pagination } = require("../config/pagination");
-const { siyosatCategory } = require("../db/siyosat_category");
-
+Siyosat.sync({ force: false });
+SiyosatCategory.sync({ force: false });
 const siyosatGet = async (req, res) => {
-  const { page, page_size } = pagination(req);
-  const siyosat = await Siyosat.find()
-    .populate("category")
-    .sort({ created_at: 1 })
-    .limit(page_size)
-    .skip(page * page_size);
-  res.send({
-    page,
-    count: siyosat.length,
-    page_size,
-    data: siyosat,
-  });
+  try {
+    const { page, page_size } = pagination(req);
+    const siyosat = await Siyosat.findAll({
+      include: [{ model: SiyosatCategory, as: "category" }],
+      order: [["created_at", "ASC"]],
+      limit: page_size,
+      offset: page * page_size,
+    });
+
+    res.send({
+      page,
+      count: siyosat.length,
+      page_size,
+      data: siyosat,
+    });
+  } catch (error) {
+    console.error("Error fetching siyosat:", error);
+    res.status(500).send("Internal Server Error");
+  }
 };
 
 const siyosatGetOne = async (req, res) => {
-  const { id } = req.params;
-  if (!id || !validateInput(id)) {
-    return res.status(400).send({
-      message:
-        "input must be a 24 character hex string, 12 byte Uint8Array, or an integer",
+  try {
+    const { id } = req.params;
+
+    if (!id || !validateInput(id)) {
+      return res.status(400).send({
+        message: "Input must be a valid identifier.",
+      });
+    }
+
+    const foundSiyosat = await Siyosat.findOne({
+      where: {
+        id: id,
+      },
     });
-  }
-  const foundSiyosat = await Siyosat.findOne({ _id: id });
-  if (!foundSiyosat) {
-    return res.send({
-      message: "Siyosat not found: " + id,
+
+    if (!foundSiyosat) {
+      return res.status(404).send({
+        message: "Siyosat not found: " + id,
+      });
+    }
+
+    res.send({
+      data: foundSiyosat,
     });
+  } catch (error) {
+    console.error("Error fetching siyosat by id:", error);
+    res.status(500).send("Internal Server Error");
   }
-  res.send({
-    data: foundSiyosat,
-  });
 };
+
 const siyosatCreate = async (req, res) => {
   try {
-    const newPost = new Siyosat({
-      title: req.body.title,
-      description: req.body.description,
-      img_url: req.body.img_url,
-      category: req.body.category,
+    const { title, description, img_url, category } = req.body;
+    await Siyosat.create({
+      title,
+      description,
+      img_url,
+      category,
     });
-    await newPost.save();
+
     res.send({ message: "ok" });
-  } catch (err) {
-    res.send({ message: err.message });
+  } catch (error) {
+    console.error("Error creating siyosat:", error);
+    res.status(500).send("Internal Server Error");
   }
 };
+
 const siyosatDelete = async (req, res) => {
-  const { id } = req.body;
-  const foundSiyosat = await Siyosat.findOne({ _id: id });
-  if (!id || !validateInput(id)) {
-    return res.status(400).send({
-      message:
-        "input must be a 24 character hex string, 12 byte Uint8Array, or an integer",
+  try {
+    const { id } = req.body;
+    const foundSiyosat = await Siyosat.findOne({ where: { id: id } });
+
+    if (!id || !validateInput(id)) {
+      return res.status(400).send({
+        message: "Input must be a valid identifier.",
+      });
+    }
+
+    if (!foundSiyosat) {
+      return res.status(404).send({
+        message: "Siyosat not found: " + req.body.id,
+      });
+    }
+
+    await Siyosat.destroy({
+      where: {
+        id: id,
+      },
     });
+
+    res.send({ message: "deleted" });
+  } catch (error) {
+    console.error("Error deleting siyosat:", error);
+    res.status(500).send("Internal Server Error");
   }
-  if (!foundSiyosat) {
-    return res.send({
-      message: "Post not found: " + req.body.id,
-    });
-  }
-  await Siyosat.findByIdAndDelete(id);
-  res.send({ message: "deleted" });
 };
+
 const siyosatUpdate = async (req, res) => {
-  const { img_url, title, description } = req.body;
-  if (!req.params.id || !validateInput(req.params.id)) {
-    return res.status(400).send({
-      message:
-        "input must be a 24 character hex string, 12 byte Uint8Array, or an integer",
+  try {
+    const { id } = req.params;
+    const { img_url, title, description } = req.body;
+
+    if (!id || !validateInput(id)) {
+      return res.status(400).send({
+        message: "Input must be a valid identifier.",
+      });
+    }
+
+    const foundSiyosat = await Siyosat.findOne({
+      where: {
+        id: id,
+      },
     });
+
+    if (!foundSiyosat) {
+      return res.status(404).send({
+        message: "Siyosat not found: " + req.params.id,
+      });
+    }
+
+    await Siyosat.update(
+      {
+        img_url,
+        title,
+        description,
+        updated_at: new Date(),
+      },
+      {
+        where: {
+          id: id,
+        },
+      },
+    );
+
+    res.send({ message: "updated" });
+  } catch (error) {
+    console.error("Error updating siyosat:", error);
+    res.status(500).send("Internal Server Error");
   }
-  const foundSiyosat = await Siyosat.findOne({ _id: req.params.id });
-  if (!foundSiyosat) {
-    return res.send({
-      message: "Siyosat Post not found: " + req.params.id,
-    });
-  }
-  await Siyosat.findByIdAndUpdate(req.params.id, {
-    img_url,
-    title,
-    description,
-    updated_at: new Date(),
-  });
-  res.send({ message: "updated" });
 };
+
 const findByCategory = async (req, res) => {
-  const siyosat = await siyosatCategory.findOne({ _id: req.params.id });
-  if (!siyosat) {
-    return res.status(404).send({
-      message: "Category not found",
+  try {
+    const { id } = req.params;
+    const siyosatCategory = await SiyosatCategory.findOne({
+      where: { id: id },
     });
+
+    if (!siyosatCategory) {
+      return res.status(404).send({
+        message: "Category not found",
+      });
+    }
+
+    const { page, page_size } = pagination(req);
+
+    const foundSiyosatByCategory = await Siyosat.findAll({
+      where: {
+        category_id: id,
+      },
+      order: [["created_at", "ASC"]],
+      limit: page_size,
+      offset: page * page_size,
+    });
+
+    res.send({
+      page,
+      count: foundSiyosatByCategory.length,
+      page_size,
+      data: foundSiyosatByCategory,
+    });
+  } catch (error) {
+    console.error("Error finding siyosat by category:", error);
+    res.status(500).send("Internal Server Error");
   }
-  const { page, page_size } = pagination(req);
-  const foundSiyosatByCategory = await Siyosat.find({ category: req.params.id })
-    .sort({ created_at: 1 })
-    .limit(page_size)
-    .skip(page * page_size);
-  res.send({
-    page,
-    count: foundSiyosatByCategory.length,
-    page_size,
-    data: foundSiyosatByCategory,
-  });
 };
 module.exports = {
   siyosatGet,

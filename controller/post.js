@@ -1,145 +1,246 @@
-const { Post } = require("../db/post");
 const { validateInput } = require("../config/validate");
 const { pagination } = require("../config/pagination");
-const { postCategory } = require("../db/post_category");
-
+const PostCategory = require("../db/post_category");
+const Post = require("../db/post");
+PostCategory.sync({ force: false });
 const PostGet = async (req, res) => {
-  const { page, page_size } = pagination(req);
-  const posts = await Post.find()
-    .populate("category")
-    .sort({ created_at: 1 })
-    .limit(page_size)
-    .skip(page * page_size);
-  res.send({
-    page,
-    count: posts.length,
-    page_size,
-    data: posts,
-  });
+  try {
+    const { page, page_size } = pagination(req);
+    const posts = await Post.findAll({
+      include: [
+        {
+          model: PostCategory,
+          as: "category",
+        },
+      ],
+      order: [["created_at", "ASC"]],
+      limit: page_size,
+      offset: page * page_size,
+    });
+
+    res.send({
+      page,
+      count: posts.length,
+      page_size,
+      data: posts,
+    });
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).send("Internal Server Error");
+  }
 };
 const PostGetByTuman = async (req, res) => {
-  const { page, page_size } = pagination(req);
-  const posts =
-    req.params.tuman !== "Hammasi"
-      ? await Post.find({
-          tuman: req.params.tuman,
-          field: req.params.field,
-          decision: req.params.decision,
-        })
-          .populate("category")
-          .sort({ created_at: 1 })
-          .limit(page_size)
-          .skip(page * page_size)
-      : await Post.find()
-          .populate("category")
-          .sort({ created_at: 1 })
-          .limit(page_size)
-          .skip(page * page_size);
-  res.send({
-    page,
-    count: posts.length,
-    page_size,
-    data: posts,
-  });
-};
+  try {
+    const { page, page_size } = pagination(req);
 
+    const condition =
+      req.params.tuman !== "Hammasi"
+        ? {
+            where: {
+              tuman: req.params.tuman,
+              field: req.params.field,
+              decision: req.params.decision,
+            },
+          }
+        : {};
+
+    const posts = await Post.findAll({
+      ...condition,
+      include: [
+        {
+          model: PostCategory,
+          as: "category",
+        },
+      ],
+      order: [["created_at", "ASC"]],
+      limit: page_size,
+      offset: page * page_size,
+    });
+
+    res.send({
+      page,
+      count: posts.length,
+      page_size,
+      data: posts,
+    });
+  } catch (error) {
+    console.error("Error fetching posts by tuman:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
 const PostGetOne = async (req, res) => {
-  const { id } = req.params;
-  if (!id || !validateInput(id)) {
-    return res.status(400).send({
-      message:
-        "input must be a 24 character hex string, 12 byte Uint8Array, or an integer",
+  try {
+    const { id } = req.params;
+
+    if (!id || !validateInput(id)) {
+      return res.status(400).send({
+        message: "Input must be a valid identifier.",
+      });
+    }
+
+    const foundPost = await Post.findOne({
+      where: {
+        id: id,
+      },
     });
-  }
-  const foundPost = await Post.findOne({ _id: id });
-  if (!foundPost) {
-    return res.send({
-      message: "Post not found: " + id,
+
+    if (!foundPost) {
+      return res.status(404).send({
+        message: "Post not found: " + id,
+      });
+    }
+
+    res.send({
+      data: foundPost,
     });
+  } catch (error) {
+    console.error("Error fetching post by id:", error);
+    res.status(500).send("Internal Server Error");
   }
-  res.send({
-    data: foundPost,
-  });
 };
 const PostCreate = async (req, res) => {
   try {
-    const newPost = new Post({
-      title: req.body.title,
-      description: req.body.description,
-      img_url: req.body.img_url,
-      category: req.body.category_id,
-      tuman: req.body.tuman,
-      decision: req.body.decision,
-      field: req.body.field,
+    const { title, description, img_url, category_id, tuman, decision, field } =
+      req.body;
+
+    await Post.create({
+      title,
+      description,
+      img_url,
+      category_id,
+      tuman,
+      decision,
+      field,
     });
-    await newPost.save();
+
     res.send({ message: "ok" });
   } catch (err) {
-    res.send({ message: err.message });
+    console.error("Error creating post:", err);
+    res.status(500).send({ message: "Internal Server Error" });
   }
 };
 const PostDelete = async (req, res) => {
-  const { id } = req.body;
-  const foundPost = await Post.findOne({ _id: id });
-  if (!id || !validateInput(id)) {
-    return res.status(400).send({
-      message:
-        "input must be a 24 character hex string, 12 byte Uint8Array, or an integer",
+  try {
+    const { id } = req.body;
+
+    if (!id || !validateInput(id)) {
+      return res.status(400).send({
+        message: "Input must be a valid identifier.",
+      });
+    }
+
+    const foundPost = await Post.findOne({
+      where: {
+        id: id,
+      },
     });
-  }
-  if (!foundPost) {
-    return res.send({
-      message: "Post not found: " + req.body.id,
+
+    if (!foundPost) {
+      return res.status(404).send({
+        message: "Post not found: " + id,
+      });
+    }
+
+    await Post.destroy({
+      where: {
+        id: id,
+      },
     });
+
+    res.send({ message: "deleted" });
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    res.status(500).send("Internal Server Error");
   }
-  await Post.findByIdAndDelete(id);
-  res.send({ message: "deleted" });
 };
+
 const PostUpdate = async (req, res) => {
-  const { img_url, title, description, tuman, decision, field } = req.body;
-  if (!req.params.id || !validateInput(req.params.id)) {
-    return res.status(400).send({
-      message:
-        "input must be a 24 character hex string, 12 byte Uint8Array, or an integer",
+  try {
+    const { id } = req.params;
+    const { img_url, title, description, tuman, decision, field } = req.body;
+
+    if (!id || !validateInput(id)) {
+      return res.status(400).send({
+        message: "Input must be a valid identifier.",
+      });
+    }
+
+    const foundPost = await Post.findOne({
+      where: {
+        id: id,
+      },
     });
+
+    if (!foundPost) {
+      return res.status(404).send({
+        message: "Post not found: " + id,
+      });
+    }
+
+    await Post.update(
+      {
+        img_url,
+        title,
+        description,
+        tuman,
+        decision,
+        field,
+        updated_at: new Date(),
+      },
+      {
+        where: {
+          id: id,
+        },
+      },
+    );
+
+    res.send({ message: "updated" });
+  } catch (error) {
+    console.error("Error updating post:", error);
+    res.status(500).send("Internal Server Error");
   }
-  const foundPost = await Post.findOne({ _id: req.params.id });
-  if (!foundPost) {
-    return res.send({
-      message: "Swiper Post not found: " + req.params.id,
-    });
-  }
-  await Post.findByIdAndUpdate(req.params.id, {
-    img_url,
-    title,
-    description,
-    tuman,
-    decision,
-    field,
-    updated_at: new Date(),
-  });
-  res.send({ message: "updated" });
 };
 const findByCategory = async (req, res) => {
-  const category = await postCategory.findOne({ _id: req.params.id });
-  if (!category) {
-    return res.status(404).send({
-      message: "Category not found",
+  try {
+    const category = await PostCategory.findOne({
+      where: {
+        id: req.params.id,
+      },
     });
+
+    if (!category) {
+      return res.status(404).send({
+        message: "Category not found",
+      });
+    }
+
+    const { page, page_size } = pagination(req);
+
+    const foundPostsByCategory = await Post.findAll({
+      where: {
+        category_id: req.params.id,
+      },
+      order: [["created_at", "ASC"]],
+      limit: page_size,
+      offset: page * page_size,
+    });
+
+    const totalPosts = await Post.count({
+      where: {
+        category_id: req.params.id,
+      },
+    });
+
+    res.send({
+      page,
+      count: Math.ceil(totalPosts / page_size),
+      page_size,
+      data: foundPostsByCategory,
+    });
+  } catch (error) {
+    console.error("Error finding posts by category:", error);
+    res.status(500).send("Internal Server Error");
   }
-  const { page, page_size } = pagination(req);
-  const foundPostsByCategory = await Post.find({ category: req.params.id })
-    .sort({ created_at: 1 })
-    .limit(page_size)
-    .skip(page * page_size);
-  res.send({
-    page,
-    count: Math.ceil(
-      (await Post.countDocuments({ category: req.params.id })) / page_size,
-    ),
-    page_size,
-    data: foundPostsByCategory,
-  });
 };
 module.exports = {
   PostGet,
