@@ -8,7 +8,7 @@ const siyosatGet = async (req, res) => {
   try {
     const { page, page_size } = pagination(req);
     const siyosat = await Siyosat.findAll({
-      include: [{ model: SiyosatCategory, as: "category" }],
+      include: [{ model: SiyosatCategory }],
       order: [["created_at", "ASC"]],
       limit: page_size,
       offset: page * page_size,

@@ -11,7 +11,6 @@ const PostGet = async (req, res) => {
       include: [
         {
           model: PostCategory,
-          as: "category",
         },
       ],
       order: [["created_at", "ASC"]],
@@ -46,11 +45,10 @@ const PostGetByTuman = async (req, res) => {
         : {};
 
     const posts = await Post.findAll({
-      ...condition,
       include: [
         {
           model: PostCategory,
-          as: "category",
+          ...condition,
         },
       ],
       order: [["created_at", "ASC"]],

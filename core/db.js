@@ -1,6 +1,6 @@
 const { Sequelize } = require("sequelize");
 
-const sequelize = new Sequelize(process.env.POSTGRES_URL, { logging: false });
+const sequelize = new Sequelize(process.env.POSTGRES_URL, { logging: true });
 
 sequelize
   .authenticate()

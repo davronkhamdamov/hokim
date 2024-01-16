@@ -69,5 +69,8 @@ const Post = sequelize.define(
 PostCategory.hasMany(Post, {
   foreignKey: "category_id",
 });
+Post.belongsTo(PostCategory, {
+  foreignKey: "category_id",
+});
 
 module.exports = Post;
