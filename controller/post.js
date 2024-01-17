@@ -6,23 +6,22 @@ PostCategory.sync({ force: false });
 Post.sync({ force: false });
 const PostGet = async (req, res) => {
   try {
-    const { page, page_size } = pagination(req);
-    const posts = await Post.findAll({
+    const page = req.query.page ? parseInt(req.query.page) : 1;
+    const per_page = req.query.per_page ? parseInt(req.query.per_page) : 1;
+    const { count, rows } = await Post.findAndCountAll({
       include: [
         {
           model: PostCategory,
         },
       ],
       order: [["created_at", "ASC"]],
-      limit: page_size,
-      offset: page * page_size,
+      limit: per_page,
+      distinct: true,
+      offset: (page - 1) * page,
     });
-
+    const result = pagination({ data: rows, count, page, per_page });
     res.send({
-      page,
-      count: posts.length,
-      page_size,
-      data: posts,
+      data: result,
     });
   } catch (error) {
     console.error("Error fetching posts:", error);
@@ -37,7 +36,6 @@ const PostGetByTuman = async (req, res) => {
       req.params.tuman !== "Hammasi"
         ? {
             where: {
-              tuman: req.params.tuman,
               field: req.params.field,
               decision: req.params.decision,
             },
@@ -107,7 +105,6 @@ const PostCreate = async (req, res) => {
       description,
       img_url,
       category_id,
-      tuman,
       decision,
       field,
     });
@@ -115,7 +112,7 @@ const PostCreate = async (req, res) => {
     res.send({ message: "ok" });
   } catch (err) {
     console.error("Error creating post:", err);
-    res.status(500).send({ message: "Internal Server Error" });
+    res.status(500).send({ message: err.message });
   }
 };
 const PostDelete = async (req, res) => {
@@ -156,7 +153,7 @@ const PostDelete = async (req, res) => {
 const PostUpdate = async (req, res) => {
   try {
     const { id } = req.params;
-    const { img_url, title, description, tuman, decision, field } = req.body;
+    const { img_url, title, description, decision, field } = req.body;
 
     if (!id || !validateInput(id)) {
       return res.status(400).send({
@@ -181,7 +178,6 @@ const PostUpdate = async (req, res) => {
         img_url,
         title,
         description,
-        tuman,
         decision,
         field,
         updated_at: new Date(),

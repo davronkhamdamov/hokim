@@ -30,10 +30,6 @@ const Post = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
-    tuman: {
-      type: DataTypes.STRING,
-      defaultValue: null,
-    },
     field: {
       type: DataTypes.STRING,
       defaultValue: null,

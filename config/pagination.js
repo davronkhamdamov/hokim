@@ -1,15 +1,18 @@
-const pagination = (req) => {
-  const pageAsNumber = Number.parseInt(req.query.page);
-  const sizeAsNumber = Number.parseInt(req.query.page_size);
-  let page = 0;
-  if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-    page = pageAsNumber;
-  }
-  let page_size = 10;
-  if (!Number.isNaN(sizeAsNumber) && pageAsNumber > 0 && pageAsNumber > 10) {
-    page_size = sizeAsNumber;
-  }
-  return { page_size, page };
+module.exports.pagination = (data) => {
+  const total_page = Math.ceil(data.count / data.per_page);
+  const total_per_page = data.per_page;
+  const current_page = data.page;
+  const previous_page = current_page === 1 ? null : current_page - 1;
+  const next_page = current_page === total_page ? null : current_page + 1;
+  return {
+    data: data.data,
+    pagination: {
+      total_records: data.count,
+      total_per_page: total_per_page,
+      total_page,
+      current_page,
+      previous_page,
+      next_page,
+    },
+  };
 };
-
-module.exports = { pagination };
