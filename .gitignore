@@ -2,4 +2,3 @@ node_modules
 *-lock.json
 .idea
 .env
-*.db
