@@ -10,11 +10,11 @@ const {
   PostGetByTuman,
 } = require("../controller/post");
 
-rout.get("/post", PostGet);
-rout.get("/post/:id", PostGetOne);
-rout.post("/post", PostCreate);
-rout.delete("/post", PostDelete);
-rout.put("/post", PostUpdate);
+rout.get("/tuman", PostGet);
+rout.get("/tuman/:id", PostGetOne);
+rout.post("/tuman", PostCreate);
+rout.delete("/tuman", PostDelete);
+rout.put("/tuman", PostUpdate);
 rout.get("/post-by-category/:id", findByCategory);
 rout.get("/post-by-tuman/:tuman", PostGetByTuman);
 
