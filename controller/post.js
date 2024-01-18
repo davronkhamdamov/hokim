@@ -7,7 +7,7 @@ Post.sync({ force: false });
 const PostGet = async (req, res) => {
   try {
     const page = req.query.page ? parseInt(req.query.page) : 1;
-    const per_page = req.query.per_page ? parseInt(req.query.per_page) : 1;
+    const per_page = req.query.per_page ? parseInt(req.query.per_page) : 10;
     const { count, rows } = await Post.findAndCountAll({
       include: [
         {
@@ -68,8 +68,7 @@ const PostGetByTuman = async (req, res) => {
 const PostGetOne = async (req, res) => {
   try {
     const { id } = req.params;
-
-    if (!id || !validateInput(id)) {
+    if (!id || validateInput(id)) {
       return res.status(400).send({
         message: "Input must be a valid identifier.",
       });
@@ -216,8 +215,6 @@ const findByCategory = async (req, res) => {
         category_id: req.params.id,
       },
       order: [["created_at", "ASC"]],
-      limit: page_size,
-      offset: page * page_size,
     });
 
     const totalPosts = await Post.count({

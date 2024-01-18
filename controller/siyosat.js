@@ -168,8 +168,6 @@ const findByCategory = async (req, res) => {
         category_id: id,
       },
       order: [["created_at", "ASC"]],
-      limit: page_size,
-      offset: page * page_size,
     });
 
     res.send({
