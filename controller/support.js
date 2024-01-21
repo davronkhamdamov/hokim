@@ -27,7 +27,7 @@ const SupportGetOne = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!id || !validateInput(id)) {
+    if (!id || validateInput(id)) {
       return res.status(400).send({
         message: "Input must be a valid identifier.",
       });
@@ -75,7 +75,7 @@ const SupportDelete = async (req, res) => {
     const { id } = req.body;
     const foundSupport = await Support.findOne({ where: { id: id } });
 
-    if (!id || !validateInput(id)) {
+    if (!id || validateInput(id)) {
       return res.status(400).send({
         message: "Input must be a valid identifier.",
       });

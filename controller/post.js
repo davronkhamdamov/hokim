@@ -118,7 +118,7 @@ const PostDelete = async (req, res) => {
   try {
     const { id } = req.body;
 
-    if (!id || !validateInput(id)) {
+    if (!id || validateInput(id)) {
       return res.status(400).send({
         message: "Input must be a valid identifier.",
       });
@@ -154,7 +154,7 @@ const PostUpdate = async (req, res) => {
     const { id } = req.params;
     const { img_url, title, description, decision, field } = req.body;
 
-    if (!id || !validateInput(id)) {
+    if (!id || validateInput(id)) {
       return res.status(400).send({
         message: "Input must be a valid identifier.",
       });

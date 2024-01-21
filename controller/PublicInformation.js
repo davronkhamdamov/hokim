@@ -26,7 +26,7 @@ const PublicInformationGetOne = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!id || !validateInput(id)) {
+    if (!id || validateInput(id)) {
       return res.status(400).send({
         message: "Input must be a valid identifier.",
       });

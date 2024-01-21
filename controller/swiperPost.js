@@ -20,7 +20,7 @@ const swiperPostGetOne = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!id || !validateInput(id)) {
+    if (!id || validateInput(id)) {
       return res.status(400).send({
         message: "Input must be a valid identifier.",
       });
@@ -67,7 +67,7 @@ const swiperPostCreate = async (req, res) => {
 const swiperPostDelete = async (req, res) => {
   try {
     const { id } = req.body;
-    if (!id || !validateInput(id)) {
+    if (!id || validateInput(id)) {
       return res.status(400).send({
         message: "Input must be a valid identifier.",
       });
@@ -102,7 +102,7 @@ const swiperPostUpdate = async (req, res) => {
   try {
     const { img_url, title, description } = req.body;
 
-    if (!req.params.id || !validateInput(req.params.id)) {
+    if (!req.params.id || validateInput(req.params.id)) {
       return res.status(400).send({
         message: "Input must be a valid identifier.",
       });
