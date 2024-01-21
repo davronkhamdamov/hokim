@@ -1,20 +1,12 @@
 const Support = require("../db/support");
 const { validateInput } = require("../config/validate");
-const { pagination } = require("../config/pagination");
 Support.sync({ force: false });
 const SupportGet = async (req, res) => {
   try {
-    const { page, page_size } = pagination(req);
     const support = await Support.findAll({
-      order: [["created_at", "DESC"]],
-      limit: page_size,
-      offset: page * page_size,
+      order: [["created_at", "ASC"]],
     });
-
     res.send({
-      page,
-      count: support?.length,
-      page_size,
       data: support,
     });
   } catch (error) {

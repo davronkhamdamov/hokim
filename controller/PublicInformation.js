@@ -4,18 +4,15 @@ const { pagination } = require("../config/pagination");
 PublicInformation.sync({ force: false });
 const PublicInformationGet = async (req, res) => {
   try {
-    const { page, page_size } = pagination(req);
-    const posts = await PublicInformation.findAll({
+    const page = req.query.page ? parseInt(req.query.page) : 1;
+    const per_page = req.query.per_page ? parseInt(req.query.per_page) : 10;
+    const { count, rows } = await PublicInformation.findAndCountAll({
       order: [["created_at", "ASC"]],
-      limit: page_size,
-      offset: page * page_size,
+      limit: per_page,
+      distinct: true,
+      offset: (page - 1) * page,
     });
-
-    res.send({
-      page,
-      page_size,
-      data: posts,
-    });
+    res.send(pagination({ data: rows, count, page, per_page }));
   } catch (error) {
     console.error("Error fetching public information:", error);
     res.status(500).send("Internal Server Error");

@@ -6,20 +6,16 @@ Siyosat.sync({ force: false });
 SiyosatCategory.sync({ force: false });
 const siyosatGet = async (req, res) => {
   try {
-    const { page, page_size } = pagination(req);
-    const siyosat = await Siyosat.findAll({
+    const page = req.query.page ? parseInt(req.query.page) : 1;
+    const per_page = req.query.per_page ? parseInt(req.query.per_page) : 10;
+    const { count, rows } = await Siyosat.findAndCountAll({
       include: [{ model: SiyosatCategory }],
       order: [["created_at", "ASC"]],
-      limit: page_size,
-      offset: page * page_size,
+      limit: per_page,
+      distinct: true,
+      offset: (page - 1) * page,
     });
-
-    res.send({
-      page,
-      count: siyosat.length,
-      page_size,
-      data: siyosat,
-    });
+    res.send(pagination({ data: rows, count, page, per_page }));
   } catch (error) {
     console.error("Error fetching siyosat:", error);
     res.status(500).send("Internal Server Error");
