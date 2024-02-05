@@ -19,5 +19,7 @@ jobs:
         script: |
           cd ~/hokim
           git pull
+          export NVM_DIR=~/.nvm
+          source ~/.nvm/nvm.sh
           npm i
           pm2 restart server
