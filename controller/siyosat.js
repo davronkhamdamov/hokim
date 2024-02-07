@@ -55,12 +55,12 @@ const siyosatGetOne = async (req, res) => {
 
 const siyosatCreate = async (req, res) => {
     try {
-        const { title, description, img_url, category } = req.body;
+        const { title, description, img_url, category_id } = req.body;
         await Siyosat.create({
             title,
             description,
             img_url,
-            category,
+            category_id,
         });
 
         res.send({ message: "ok" });
