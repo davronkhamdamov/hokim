@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const Admin = (req, res) => {
     const { login, password } = req.body;
-    if (login === "admin" && password === "admin") {
+    if (login === process.env.LOGIN && password === process.env.PASSWORD) {
         const oneHour = 3600000;
         const expirationDate = new Date(Date.now() + oneHour);
         res.cookie(
