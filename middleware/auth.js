@@ -7,7 +7,6 @@ module.exports = async function (req, res, next) {
         req.userId = decoded.id;
         next();
     } catch (error) {
-        res.clearCookie("authorization");
         res.status(401).json({ message: "Unauthorized" });
     }
 };
