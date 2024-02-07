@@ -12,7 +12,7 @@ const Admin = (req, res) => {
             }),
             {
                 expires: expirationDate,
-                httpOnly: true,
+                secure: true,
             }
         );
         res.send({
