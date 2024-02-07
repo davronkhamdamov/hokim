@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("./core/db");
+require("dotenv/config");
 const createError = require("http-errors");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
