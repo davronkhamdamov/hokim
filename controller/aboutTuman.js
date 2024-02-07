@@ -1,5 +1,5 @@
 const aboutTuman = require("../db/aboutTuman");
-aboutTuman.sync({ force: true });
+aboutTuman.sync({ force: false });
 const getAll = async (req, res) => {
     try {
         const allTuman = await aboutTuman.findAll();
