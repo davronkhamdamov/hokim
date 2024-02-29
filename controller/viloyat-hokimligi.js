@@ -19,7 +19,7 @@ async function ViloyatGet(req, res) {
 }
 async function ViloyatDelete(req, res) {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
 
         if (!id || validateInput(id)) {
             return res.status(400).send({
