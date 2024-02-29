@@ -3,7 +3,7 @@ const { validateInput } = require("../config/validate");
 ViloyatHokimligi.sync({ force: true });
 
 async function ViloyatCreate(req, res) {
-    const newData = ViloyatHokimligi.create({ title: req.body.title });
+    const newData = ViloyatHokimligi.create({ text: req.body.text });
     try {
         await newData.save();
         res.send({
