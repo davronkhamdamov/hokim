@@ -1,6 +1,6 @@
 const ViloyatHokimligi = require("../db/viloyatHokimligi");
 const { validateInput } = require("../config/validate");
-ViloyatHokimligi.sync({ force: true });
+ViloyatHokimligi.sync({ force: false });
 
 async function ViloyatCreate(req, res) {
     const newData = ViloyatHokimligi.create({ title: req.body.title });
