@@ -3,9 +3,8 @@ const { validateInput } = require("../config/validate");
 ViloyatHokimligi.sync({ force: false });
 
 async function ViloyatCreate(req, res) {
-    const newData = ViloyatHokimligi.create({ text: req.body.text });
     try {
-        await newData.save();
+        await ViloyatHokimligi.create({ text: req.body.text });
         res.send({
             message: "Yaratildi",
         });
