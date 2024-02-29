@@ -5,7 +5,7 @@ ViloyatHokimligi.sync({ force: false });
 async function ViloyatCreate(req, res) {
     try {
         await ViloyatHokimligi.create({ text: req.body.text });
-        res.send({
+        res.status(201).send({
             message: "Yaratildi",
         });
     } catch (error) {
