@@ -15,6 +15,7 @@ const siyosat = require("./router/siyosat");
 const publicInformation = require("./router/publicInformation");
 const AboutTuman = require("./router/aboutTuman");
 const Admin = require("./router/admin");
+const ViloyatHokimligi = require("./router/viloyat-hokimligi");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -33,6 +34,7 @@ app.use(siyosat);
 app.use(siyosatCategory);
 app.use(publicInformation);
 app.use(AboutTuman);
+app.use(ViloyatHokimligi);
 
 app.use(function (req, res, next) {
     next(createError(404));
